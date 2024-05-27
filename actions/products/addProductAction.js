@@ -1,4 +1,4 @@
-const createProductRepo = require("../../repositories/products/createProductRepo");
+const createProductRepo = require("../../r/products/createProductRepo");
 
 const addProductAction = async (title, price, description, published) => { 
     try {
