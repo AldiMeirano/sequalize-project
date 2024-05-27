@@ -12,9 +12,10 @@ app.use(express.urlencoded({ extended: true }))
 
 
 // routers
-const router = require('./routers/productRouter')
-app.use('/api/products', router)
-
+const product = require('./routers/productRouter')
+const user = require('./routers/userRouter')
+app.use('/api/products', product)
+app.use('/api/user', user)
 
 
 const PORT = process.env.PORT || 8080
