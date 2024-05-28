@@ -129,4 +129,35 @@ const verifiedCode = async (req, res) => {
     console.log(error);
   }
 };
-module.exports = { registerAccount, loginAccount, verifiedCode };
+
+const forgotPassword = async (req, res) => {
+  try {
+    let user = await User.findOne({ where: { email: req.body.email } });
+    if (!user) throw new Error("Account not found");
+    const token = createToken({ email: user.email });
+    const templatePath = path.join(
+      __dirname,
+      "../templates",
+      "templateResetPassword.hbs"
+    );
+    const templateSource = await fs.promises.readFile(templatePath, "utf8");
+    const compileTemplate = Handlebars.compile(templateSource);
+    const html = compileTemplate({ name: user.name });
+
+    await transporter.sendMail({
+      from: "sender",
+      to: user.email,
+      subject: "Reset password link",
+      html,
+    });
+    res.send(response(200, token, "Please check your email for verification"));
+  } catch (error) {
+    console.log(error);
+  }
+};
+module.exports = {
+  registerAccount,
+  loginAccount,
+  verifiedCode,
+  forgotPassword,
+};
