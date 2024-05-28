@@ -1,11 +1,16 @@
+const path = require("path");
+const fs = require("fs");
 const excludeFields = require("../helper/excludeFields");
 const createToken = require("../helper/jwt");
 const response = require("../helper/response");
 const { hashPassword, comparePasswords } = require("../lib/bcrypt");
 const generateRandomId = require("../lib/randomnum");
 const db = require("../models");
-
-// const scheduler = require("node-schedule");
+const Handlebars = require("handlebars");
+const transporter = require("../lib/nodemailer");
+const scheduler = require("node-schedule");
+const { log } = require("console");
+const { where } = require("sequelize");
 
 const User = db.user;
 
@@ -20,11 +25,51 @@ const registerAccount = async (req, res) => {
     let info = {
       name: req.body.name,
       code_refferal: `SEQ-${generateRandomId(4)}`,
-
       email: req.body.email,
       password: req.body.password,
     };
+
     const product = await User.create(info);
+
+    const templatePath = path.join(
+      __dirname,
+      "../templates",
+      "templateEmail.hbs"
+    );
+    const templateSource = await fs.promises.readFile(templatePath, "utf8");
+    const compileTemplate = Handlebars.compile(templateSource);
+    const html = compileTemplate({
+      name: name,
+    });
+
+    await transporter.sendMail({
+      from: "sender",
+      to: email,
+      subject: "Verification your email",
+      html,
+    });
+
+    const oneMinuteFromNow = new Date(Date.now() + 1 * 60 * 1000);
+    const scheduledTask = scheduler.scheduleJob(oneMinuteFromNow, async () => {
+      try {
+        const info = {
+          status: "no_verified",
+          code_refferal: `SEQ-${generateRandomId(4)}`,
+        };
+        let userData = await User.findOne({ where: { email: email } });
+        if (userData?.status === "pending") {
+          await User.update(info, { where: { id: userData.id } });
+          console.log("Try again, your account hasn't been verified yet");
+        }
+        if (userData.status === "verified") {
+          scheduledTask.cancel();
+          console.log("Your account is verified");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
     res.send(
       response(
         200,
@@ -32,6 +77,7 @@ const registerAccount = async (req, res) => {
         "Success Register check your email for verified you account"
       )
     );
+
     console.log(product);
   } catch (error) {
     throw error;
@@ -62,4 +108,25 @@ const loginAccount = async (req, res) => {
     throw error;
   }
 };
-module.exports = { registerAccount, loginAccount };
+
+const verifiedCode = async (req, res) => {
+  try {
+    let userData = await User.findOne({ where: { id: req.body.id } });
+    if (userData.code_refferal !== req.body.code_refferal) {
+      res.send(response(405, null, "Your otp its not correct"));
+    }
+    const info = {
+      status: "verified",
+      code_refferal: `SEQ-${generateRandomId(4)}`,
+    };
+    if (userData.code_refferal) {
+      const data = await User.update(info, {
+        where: { id: userData.id },
+      });
+      res.send(response(200, data, "Success verified code"));
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+module.exports = { registerAccount, loginAccount, verifiedCode };
