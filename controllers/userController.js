@@ -11,6 +11,7 @@ const transporter = require("../lib/nodemailer");
 const scheduler = require("node-schedule");
 const { log } = require("console");
 const { where } = require("sequelize");
+const { updateProduct } = require("./productController");
 
 const User = db.user;
 
@@ -155,7 +156,22 @@ const forgotPassword = async (req, res) => {
     console.log(error);
   }
 };
+
+const resetPassword = async (req, res) => {
+  const { password, confirmPassword, email } = req.body;
+  if (password !== confirmPassword) throw new Error("Password not match");
+  let user = await User.findOne({ where: { email: email } });
+  if (!user) throw new Error("Account not found");
+
+  const hashedPassword = await hashPassword(password);
+  const info = {
+    password: hashedPassword,
+  };
+  await User.update(info, { where: { email: email } });
+  res.send(response(200, user, "Reset password success"));
+};
 module.exports = {
+  resetPassword,
   registerAccount,
   loginAccount,
   verifiedCode,
