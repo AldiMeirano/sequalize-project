@@ -2,7 +2,10 @@ const excludeFields = require("../helper/excludeFields");
 const createToken = require("../helper/jwt");
 const response = require("../helper/response");
 const { hashPassword, comparePasswords } = require("../lib/bcrypt");
+const generateRandomId = require("../lib/randomnum");
 const db = require("../models");
+
+// const scheduler = require("node-schedule");
 
 const User = db.user;
 
@@ -16,11 +19,19 @@ const registerAccount = async (req, res) => {
     req.body.password = hashedPassword;
     let info = {
       name: req.body.name,
+      code_refferal: `SEQ-${generateRandomId(4)}`,
+
       email: req.body.email,
       password: req.body.password,
     };
     const product = await User.create(info);
-    res.send(response(200, product, "Success Register"));
+    res.send(
+      response(
+        200,
+        product,
+        "Success Register check your email for verified you account"
+      )
+    );
     console.log(product);
   } catch (error) {
     throw error;
