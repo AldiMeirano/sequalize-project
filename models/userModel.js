@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      image: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       status: {
         type: DataTypes.ENUM,
         values: ["verified", "no_verified", "pending"],

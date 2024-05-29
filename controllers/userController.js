@@ -11,8 +11,8 @@ const transporter = require("../lib/nodemailer");
 const scheduler = require("node-schedule");
 const { log } = require("console");
 const { where } = require("sequelize");
-const { updateProduct } = require("./productController");
-
+// const { updateProduct } = require("");
+const { join } = require("path") ;
 const User = db.user;
 
 const registerAccount = async (req, res) => {
@@ -93,9 +93,7 @@ const loginAccount = async (req, res) => {
     if (!user) throw new Error("Account not found!");
 
     const isPasswordValid = await comparePasswords(password, user.password);
-
     if (!isPasswordValid) throw new Error("Invalid Password");
-
     const dataWithoutPassword = excludeFields(user, ["password"]);
 
     const token = createToken({ email: user.email });
@@ -151,13 +149,13 @@ const forgotPassword = async (req, res) => {
       subject: "Reset password link",
       html,
     });
-    res.send(response(200, token, "Please check your email for verification"));
+    res.send(response(200,"Please check your email for verification",token ));
   } catch (error) {
     console.log(error);
   }
 };
 
-const resetPassword = async (req, res) => {
+ const resetPassword = async (req, res) => {
   const { password, confirmPassword, email } = req.body;
   if (password !== confirmPassword) throw new Error("Password not match");
   let user = await User.findOne({ where: { email: email } });
@@ -170,7 +168,39 @@ const resetPassword = async (req, res) => {
   await User.update(info, { where: { email: email } });
   res.send(response(200, user, "Reset password success"));
 };
+
+
+const uploadPicture = async (req, res) => {
+  try {
+    const { file, user } = req;
+
+    const userData = await User.findOne({
+      where: { email: user.email },
+    });
+    console.log('rizur',userData.dataValues.image);
+    const defaultDir = "../public/profile";
+    const isOldImageExist = fs.existsSync(
+      join(__dirname, defaultDir + userData.dataValues.image)
+    );
+
+    if (isOldImageExist) {
+      fs.unlinkSync(join(__dirname, defaultDir + userData.dataValues.image));
+    }
+
+    const info= { 
+      image: `/${file?.filename}`
+    }
+    const data = await User.update(info, {
+      where: { id: userData.id },
+    });
+     res.status(response(200,"Success upload picture", data));
+  } catch (error) {
+    console.error("Error:", error);
+
+  }
+};
 module.exports = {
+  uploadPicture,
   resetPassword,
   registerAccount,
   loginAccount,
