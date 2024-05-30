@@ -14,6 +14,8 @@ app.use(express.urlencoded({ extended: true }))
 // routers
 const product = require('./routers/productRouter')
 const user = require('./routers/userRouter')
+const book = require("./routers/bookRouter");
+app.use("/api/book", book);
 app.use('/api/products', product)
 app.use('/api/user', user)
 

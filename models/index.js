@@ -31,12 +31,16 @@ sequelize.authenticate()
 const db = {}
 
 db.Sequelize = Sequelize
-db.sequelize = sequelize
-
-db.products = require('./productModel.js')(sequelize, DataTypes)
-db.user = require('./userModel.js')(sequelize, DataTypes)
+db.sequelize = sequelize;
+db.products = require("./productModel.js")(sequelize, DataTypes);
+db.user = require("./userModel.js")(sequelize, DataTypes);
+db.book = require("./bookModel.js")(sequelize, DataTypes);
+db.employe = require("./employeModel.js")(sequelize, DataTypes);
+db.transaction = require("./transactionModel.js")(sequelize, DataTypes);
 db.sequelize.sync({ force: false }).then(() => {
   console.log("Yes re-sync done");
 });
+
+// Relationship between table
 
 module.exports = db
