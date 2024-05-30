@@ -156,49 +156,50 @@ const forgotPassword = async (req, res) => {
 };
 
  const resetPassword = async (req, res) => {
-  const { password, confirmPassword, email } = req.body;
-  if (password !== confirmPassword) throw new Error("Password not match");
-  let user = await User.findOne({ where: { email: email } });
-  if (!user) throw new Error("Account not found");
+   const { password, confirmPassword, email } = req.body;
+   if (password !== confirmPassword) throw new Error("Password not match");
+   let user = await User.findOne({ where: { email: email } });
+   if (!user) throw new Error("Account not found");
 
-  const hashedPassword = await hashPassword(password);
-  const info = {
-    password: hashedPassword,
-  };
-  await User.update(info, { where: { email: email } });
-  res.send(response(200, user, "Reset password success"));
-};
+   const hashedPassword = await hashPassword(password);
+   const info = {
+     password: hashedPassword,
+   };
+   await User.update(info, { where: { email: email } });
+   res.send(response(200, user, "Reset password success"));
+ };
 
+ const uploadPicture = async (req, res) => {
+   try {
+     const { file, user } = req;
+     const userData = await User.findOne({
+       where: { email: user.email },
+     });
 
-const uploadPicture = async (req, res) => {
-  try {
-    const { file, user } = req;
+     const defaultDir = "../public/profile";
+     const isOldImageExist = fs.existsSync(
+       join(__dirname, defaultDir + userData.dataValues.image)
+     );
 
-    const userData = await User.findOne({
-      where: { email: user.email },
-    });
-    console.log('rizur',userData.dataValues.image);
-    const defaultDir = "../public/profile";
-    const isOldImageExist = fs.existsSync(
-      join(__dirname, defaultDir + userData.dataValues.image)
-    );
+     if (isOldImageExist) {
+       fs.unlinkSync(join(__dirname, defaultDir + userData.dataValues.image));
+     }
 
-    if (isOldImageExist) {
-      fs.unlinkSync(join(__dirname, defaultDir + userData.dataValues.image));
-    }
-
-    const info= { 
-      image: `/${file?.filename}`
-    }
-    const data = await User.update(info, {
-      where: { id: userData.id },
-    });
-     res.status(response(200,"Success upload picture", data));
-  } catch (error) {
-    console.error("Error:", error);
-
-  }
-};
+     const info = {
+       image: `/${file?.filename}`,
+     };
+     const data = await User.update(info, {
+       where: { email: userData.email },
+     });
+     res.status(200).send({
+       status: 200,
+       message: "Success upload picture",
+       data,
+     });
+   } catch (error) {
+     console.error("Error:", error);
+   }
+ };
 module.exports = {
   uploadPicture,
   resetPassword,
