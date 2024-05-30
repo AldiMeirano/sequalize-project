@@ -73,4 +73,19 @@ const createTransaction = async (req, res) => {
   }
 };
 
-module.exports = { createTransaction };
+
+const getDataTransaction = async (req, res) => {
+  const id = req.params.id;
+  const transaction = await db.transaction.findOne({
+    where: { id: id },
+    include: [
+      { model: db.user, as: "user" },
+      { model: db.employe, as: "employe" },
+      { model: db.book, as: "book" },
+    ],
+  });
+
+  res.send(response(200, transaction, "Successfully get data"));
+  // book employe user
+};
+module.exports = { createTransaction, getDataTransaction };
