@@ -37,19 +37,21 @@ db.user = require("./userModel.js")(sequelize, DataTypes);
 db.book = require("./bookModel.js")(sequelize, DataTypes);
 db.employe = require("./employeModel.js")(sequelize, DataTypes);
 db.transaction = require("./transactionModel.js")(sequelize, DataTypes);
+db.penalty = require("./penaltyModel.js")(sequelize, DataTypes);
 db.sequelize.sync({ force: false }).then(() => {
   console.log("Yes re-sync done");
 });
 
 // Definisi asosiasi antara Transaction, User, Employee, dan Book
-db.transaction.belongsTo(db.user, { foreignKey: 'userId' });
-db.transaction.belongsTo(db.employe, { foreignKey: 'employeId' });
-db.transaction.belongsTo(db.book, { foreignKey: 'bookid' });
+db.transaction.belongsTo(db.user, { foreignKey: "userId" });
+db.transaction.belongsTo(db.employe, { foreignKey: "employeId" });
+db.transaction.belongsTo(db.book, { foreignKey: "bookid" });
+db.transaction.belongsTo(db.penalty, { foreignKey: "penaltyId" });
 // Relationship between table
-db.user.hasMany(db.transaction, { foreignKey: 'userId' });
-db.employe.hasMany(db.transaction, { foreignKey: 'employeId' });
-db.book.hasMany(db.transaction, { foreignKey: 'bookid' });
-
+db.user.hasMany(db.transaction, { foreignKey: "userId" });
+db.employe.hasMany(db.transaction, { foreignKey: "employeId" });
+db.book.hasMany(db.transaction, { foreignKey: "bookid" });
+db.penalty.hasMany(db.transaction, { foreignKey: "penaltyId" });
 
 
 module.exports = db

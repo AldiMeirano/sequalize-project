@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    penaltyId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     checkIn: {
       type: DataTypes.DATE,
       allowNull: false,
