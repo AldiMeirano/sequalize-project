@@ -8,6 +8,7 @@ const transporter = require("../lib/nodemailer");
 const scheduler = require("node-schedule");
 const { formatDate } = require("../lib/formattedDate");
 
+
 const Transaction = db.transaction;
 const Book = db.book;
 const User = db.user;
@@ -59,27 +60,38 @@ const createTransaction = async (req, res) => {
     const oneMinuteFromNow = new Date(Date.now() + 1 * 60 * 1000);
     scheduler.scheduleJob(oneMinuteFromNow, async () => {
       try {
-        const templatePath = path.join(
-          __dirname,
-          "../templates",
-          "warningBook.hbs"
-        );
-        const templateSource = await fs.promises.readFile(templatePath, "utf8");
-        const compileTemplate = Handlebars.compile(templateSource);
-        const html = compileTemplate({
-          name: "asdsa",
-        });
+        const bookData = await Book.findOne({ where: { id: id } });
+        if (bookData.status == "unavailable") {
+          const templatePath = path.join(
+            __dirname,
+            "../templates",
+            "warningBook.hbs"
+          );
+          const templateSource = await fs.promises.readFile(
+            templatePath,
+            "utf8"
+          );
+          const compileTemplate = Handlebars.compile(templateSource);
+          const html = compileTemplate({
+            name: "asdsa",
+          });
 
-        await transporter.sendMail({
-          from: "sender",
-          to: email,
-          subject: "After borrow libary book",
-          html,
-        });
+          await transporter.sendMail({
+            from: "sender",
+            to: email,
+            subject: "After borrow libary book",
+            html,
+          });
+          console.log("He doesnt");
+        } else {
+          scheduledTask.cancel();
+          console.log("Cancel task");
+        }
 
         await User.findOne({ where: { email: email } });
       } catch (error) {
         console.log(error);
+        throw error;
       }
     });
 
@@ -91,23 +103,80 @@ const createTransaction = async (req, res) => {
       )
     );
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
 
-
 const getDataTransaction = async (req, res) => {
-  const id = req.params.id;
-  const transaction = await db.transaction.findOne({
-    where: { id: id },
-    include: [
-      { model: db.user, as: "user" },
-      { model: db.employe, as: "employe" },
-      { model: db.book, as: "book" },
-    ],
-  });
+  try {
+    const id = req.params.id;
+    const transaction = await db.transaction.findOne({
+      where: { id: id },
+      include: [
+        { model: db.user, as: "user" },
+        { model: db.employe, as: "employe" },
+        { model: db.book, as: "book" },
+      ],
+    });
 
-  res.send(response(200, transaction, "Successfully get data"));
-  // book employe user
+    res.send(response(200, transaction, "Successfully get data"));
+  } catch (error) {
+    console.log(error);
+  }
 };
-module.exports = { createTransaction, getDataTransaction };
+
+const getPenalty = async (req, res) => {
+  try {
+    const token = await Transaction.findOne({
+      where: { token: req.body.token },
+    });
+
+    if (!token) {
+      res.status(400).send("Token is'nt correct");
+    }
+
+    const info = {
+      penaltyId: req.body.penaltyId,
+    };
+
+    const transaction = await Transaction.update(info, {
+      where: { token: req.body.token },
+    });
+
+    res.send(response(200, transaction, "Success send penalty to user"));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const bookReturner = async (req, res) => {
+  try {
+    const token = await Transaction.findOne({
+      where: { token: req.body.token },
+    });
+
+    if (!token) {
+      res.status(400).send("Token is'nt correct");
+    }
+
+    const info = {
+      status: "available",
+    };
+
+    const transaction = await Book.update(info, {
+      where: { id: token.bookid },
+    });
+
+    res.send(response(200, transaction, "Success return book"));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = {
+  createTransaction,
+  getDataTransaction,
+  getPenalty,
+  bookReturner,
+};
