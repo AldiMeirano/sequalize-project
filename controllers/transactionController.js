@@ -6,6 +6,7 @@ const db = require("../models");
 const Handlebars = require("handlebars");
 const transporter = require("../lib/nodemailer");
 const scheduler = require("node-schedule");
+const { formatDate } = require("../lib/formattedDate");
 
 const Transaction = db.transaction;
 const Book = db.book;
@@ -42,7 +43,10 @@ const createTransaction = async (req, res) => {
     const templateSource = await fs.promises.readFile(templatePath, "utf8");
     const compileTemplate = Handlebars.compile(templateSource);
     const html = compileTemplate({
-      name: "asdsa",
+      name: user.name,
+      checkIn: formatDate(product.checkIn),
+      checkOut: formatDate(product.checkOut),
+      token: product.token,
     });
 
     await transporter.sendMail({
@@ -55,6 +59,24 @@ const createTransaction = async (req, res) => {
     const oneMinuteFromNow = new Date(Date.now() + 1 * 60 * 1000);
     scheduler.scheduleJob(oneMinuteFromNow, async () => {
       try {
+        const templatePath = path.join(
+          __dirname,
+          "../templates",
+          "warningBook.hbs"
+        );
+        const templateSource = await fs.promises.readFile(templatePath, "utf8");
+        const compileTemplate = Handlebars.compile(templateSource);
+        const html = compileTemplate({
+          name: "asdsa",
+        });
+
+        await transporter.sendMail({
+          from: "sender",
+          to: email,
+          subject: "After borrow libary book",
+          html,
+        });
+
         await User.findOne({ where: { email: email } });
       } catch (error) {
         console.log(error);
