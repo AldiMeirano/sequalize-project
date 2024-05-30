@@ -15,10 +15,11 @@ app.use(express.urlencoded({ extended: true }))
 const product = require('./routers/productRouter')
 const user = require('./routers/userRouter')
 const book = require("./routers/bookRouter");
+const transaction = require("./routers/transactionRoute");
 app.use("/api/book", book);
-app.use('/api/products', product)
-app.use('/api/user', user)
-
+app.use("/api/products", product);
+app.use("/api/user", user);
+app.use("/api/transaction", transaction);
 
 const PORT = process.env.PORT || 8080
 
