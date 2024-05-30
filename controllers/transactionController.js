@@ -1,54 +1,61 @@
-const transactionController = async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
+const path = require("path");
+const fs = require("fs");
+const response = require("../helper/response");
+const generateRandomId = require("../lib/randomnum");
+const db = require("../models");
+const Handlebars = require("handlebars");
+const transporter = require("../lib/nodemailer");
+const scheduler = require("node-schedule");
 
-    let user = await User.findOne({ where: { email: email } });
-    if (user) throw new Error("Already register");
-    const hashedPassword = await hashPassword(password);
-    req.body.password = hashedPassword;
+const Transaction = db.transaction;
+const Book = db.book;
+const User = db.user;
+const createTransaction = async (req, res) => {
+  try {
+    const checkBook = await Book.findOne({ where: { id: req.body.bookid } });
+    if (checkBook.dataValues.status === "unavailable") {
+      return res.status(400).send({
+        message: "Sorry, the book has been borrowed",
+      });
+    }
     let info = {
-      name: req.body.name,
-      code_refferal: `SEQ-${generateRandomId(4)}`,
-      email: req.body.email,
-      password: req.body.password,
+      token: `SMB-${generateRandomId(6)}`,
+      bookid: req.body.bookid,
+      userId: req.body.userId,
+      employeId: req.body.employeId,
+      checkIn: req.body.checkIn,
+      checkOut: req.body.checkOut,
     };
 
-    const product = await User.create(info);
-
+    const product = await Transaction.create(info);
+    let user = await User.findOne({ where: { id: req.body.userId } });
+    const email = user.dataValues.email;
     const templatePath = path.join(
       __dirname,
       "../templates",
-      "templateEmail.hbs"
+      "afterCheckout.hbs"
     );
+    const updateBook = {
+      status: "unavailable",
+    };
+    await Book.update(updateBook, { where: { id: req.body.bookid } });
     const templateSource = await fs.promises.readFile(templatePath, "utf8");
     const compileTemplate = Handlebars.compile(templateSource);
     const html = compileTemplate({
-      name: name,
+      name: "asdsa",
     });
 
     await transporter.sendMail({
       from: "sender",
       to: email,
-      subject: "Verification your email",
+      subject: "After borrow libary book",
       html,
     });
 
     const oneMinuteFromNow = new Date(Date.now() + 1 * 60 * 1000);
-    const scheduledTask = scheduler.scheduleJob(oneMinuteFromNow, async () => {
+    scheduler.scheduleJob(oneMinuteFromNow, async () => {
       try {
-        const info = {
-          status: "no_verified",
-          code_refferal: `SEQ-${generateRandomId(4)}`,
-        };
-        let userData = await User.findOne({ where: { email: email } });
-        if (userData?.status === "pending") {
-          await User.update(info, { where: { id: userData.id } });
-          console.log("Try again, your account hasn't been verified yet");
-        }
-        if (userData.status === "verified") {
-          scheduledTask.cancel();
-          console.log("Your account is verified");
-        }
+        await User.findOne({ where: { email: email } });
       } catch (error) {
         console.log(error);
       }
@@ -58,12 +65,12 @@ const transactionController = async (req, res) => {
       response(
         200,
         product,
-        "Success Register check your email for verified you account"
+        "Successfully borrow a book, please go to the receptionist for data collection"
       )
     );
-
-    console.log(product);
   } catch (error) {
     throw error;
   }
 };
+
+module.exports = { createTransaction };

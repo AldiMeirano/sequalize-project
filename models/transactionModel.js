@@ -5,6 +5,10 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       type: DataTypes.INTEGER,
     },
+    token: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     bookid: {
       type: DataTypes.INTEGER,
       allowNull: false,
