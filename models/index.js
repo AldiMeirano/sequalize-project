@@ -41,6 +41,15 @@ db.sequelize.sync({ force: false }).then(() => {
   console.log("Yes re-sync done");
 });
 
+// Definisi asosiasi antara Transaction, User, Employee, dan Book
+db.transaction.belongsTo(db.user, { foreignKey: 'userId' });
+db.transaction.belongsTo(db.employe, { foreignKey: 'employeId' });
+db.transaction.belongsTo(db.book, { foreignKey: 'bookid' });
 // Relationship between table
+db.user.hasMany(db.transaction, { foreignKey: 'userId' });
+db.employe.hasMany(db.transaction, { foreignKey: 'employeId' });
+db.book.hasMany(db.transaction, { foreignKey: 'bookid' });
+
+
 
 module.exports = db
