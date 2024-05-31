@@ -200,6 +200,7 @@ const forgotPassword = async (req, res) => {
      console.error("Error:", error);
    }
  };
+ 
 module.exports = {
   uploadPicture,
   resetPassword,

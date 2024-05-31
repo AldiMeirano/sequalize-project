@@ -191,10 +191,35 @@ const searchBookOrAuthor = async (req, res) => {
     console.log(error);
   }
 };
+
+
+const extraTimeController = async (req, res) => {
+  try {
+    const data = await Transaction.findOne({
+      where: { token: req.body.token },
+    });
+
+    // Jika tidak ditemukan, kembalikan respons "Not found"
+    if (!data) {
+      return res.send(response(404, null, "Not found"));
+    }
+    const info = {
+      checkOut: req.body.checkOut,
+    };
+    const transaction = await Transaction.update(info, {
+      where: { token: req.body.token },
+    });
+
+    return res.send(response(200, transaction, "Success extratime"));
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   createTransaction,
   getDataTransaction,
   getPenalty,
   bookReturner,
   searchBookOrAuthor,
+  extraTimeController,
 };
