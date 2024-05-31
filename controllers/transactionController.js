@@ -7,7 +7,7 @@ const Handlebars = require("handlebars");
 const transporter = require("../lib/nodemailer");
 const scheduler = require("node-schedule");
 const { formatDate } = require("../lib/formattedDate");
-
+const { Op } = require("sequelize");
 
 const Transaction = db.transaction;
 const Book = db.book;
@@ -174,9 +174,27 @@ const bookReturner = async (req, res) => {
   }
 };
 
+const searchBookOrAuthor = async (req, res) => {
+  try {
+    if (req.body.title) {
+      const data = await Book.findOne({
+        where: { title: req.body.title },
+      });
+      return res.send(response(200, data, "Success get data book"));
+    } else {
+      const data = await Book.findOne({
+        where: { author: req.body.author },
+      });
+      return res.send(response(200, data, "Success get data by author"));
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   createTransaction,
   getDataTransaction,
   getPenalty,
   bookReturner,
+  searchBookOrAuthor,
 };
