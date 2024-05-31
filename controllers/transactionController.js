@@ -117,6 +117,7 @@ const getDataTransaction = async (req, res) => {
         { model: db.user, as: "user" },
         { model: db.employe, as: "employe" },
         { model: db.book, as: "book" },
+        { model: db.penalty, as: "penalty" },
       ],
     });
 
@@ -192,7 +193,6 @@ const searchBookOrAuthor = async (req, res) => {
   }
 };
 
-
 const extraTimeController = async (req, res) => {
   try {
     const data = await Transaction.findOne({
@@ -215,6 +215,13 @@ const extraTimeController = async (req, res) => {
     console.log(error);
   }
 };
+
+const uploadImage = () => {
+  try {
+  } catch (error) {
+    console.log(error);
+  }
+};
 module.exports = {
   createTransaction,
   getDataTransaction,
@@ -222,4 +229,5 @@ module.exports = {
   bookReturner,
   searchBookOrAuthor,
   extraTimeController,
+  uploadImage,
 };
