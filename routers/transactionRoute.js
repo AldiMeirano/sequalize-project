@@ -5,4 +5,5 @@ router.post("/", transactionController.createTransaction);
 router.get("/:id", transactionController.getDataTransaction);
 router.patch("/penalty", transactionController.getPenalty);
 router.patch("/return-book", transactionController.bookReturner);
+router.post("/search", transactionController.searchBookOrAuthor);
 module.exports = router;
