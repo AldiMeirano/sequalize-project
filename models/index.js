@@ -47,6 +47,7 @@ db.transaction.belongsTo(db.user, { foreignKey: "userId" });
 db.transaction.belongsTo(db.employe, { foreignKey: "employeId" });
 db.transaction.belongsTo(db.book, { foreignKey: "bookid" });
 db.transaction.belongsTo(db.penalty, { foreignKey: "penaltyId" });
+
 // Relationship between table
 db.user.hasMany(db.transaction, { foreignKey: "userId" });
 db.employe.hasMany(db.transaction, { foreignKey: "employeId" });
