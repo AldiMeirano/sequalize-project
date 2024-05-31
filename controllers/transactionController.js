@@ -178,12 +178,12 @@ const bookReturner = async (req, res) => {
 const searchBookOrAuthor = async (req, res) => {
   try {
     if (req.body.title) {
-      const data = await Book.findOne({
+      const data = await Book.findAll({
         where: { title: req.body.title },
       });
       return res.send(response(200, data, "Success get data book"));
     } else {
-      const data = await Book.findOne({
+      const data = await Book.findAll({
         where: { author: req.body.author },
       });
       return res.send(response(200, data, "Success get data by author"));
@@ -216,8 +216,23 @@ const extraTimeController = async (req, res) => {
   }
 };
 
-const uploadImage = () => {
+const uploadImage = async (req, res) => {
   try {
+    const { file, params } = req;
+    const id = parseInt(params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "Invalid room ID" });
+    }
+
+    const info = {
+      image: `/${file?.filename}`,
+    };
+
+    const data = await Book.update(info, {
+      where: { id: id },
+    });
+    return res.send(response(200, data, "Success upload picture book"));
   } catch (error) {
     console.log(error);
   }
