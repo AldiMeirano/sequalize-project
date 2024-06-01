@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM,
       values: ["borrow", "done"],
       defaultValue: "borrow",
-      // allowNull: false,
+      allowNull: false,
     },
     userId: {
       type: DataTypes.INTEGER,
@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     penaltyId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    cart: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
