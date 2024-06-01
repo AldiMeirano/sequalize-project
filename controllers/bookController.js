@@ -5,26 +5,21 @@ const Book = db.book;
 const User = db.user;
 const addNewBook = async (req, res) => {
   try {
-
     let user = await User.findOne({
       where: { code_refferal: req.body.code_refferal },
     });
-    if (user.code_refferal === "NAMTHIP") {
-      let info = {
-        title: req.body.title,
-        author: req.body.author,
-        quantity: req.body.quantity,
-      };
-
-
-      const product = await Book.create(info);
-
-      return res.send(response(200, product, "Success created new book"));
-    } else {
-      return res.send(
-        response(400, null, "Cannot access because youre not admin")
-      );
+    if (user.code_refferal !== "NAMTHIP") {
+      return res.send(response(404, null, "Youre not admin cannot"));
     }
+    let info = {
+      title: req.body.title,
+      author: req.body.author,
+      quantity: req.body.quantity,
+    };
+
+    const product = await Book.create(info);
+
+    return res.send(response(200, product, "Success created new book"));
   } catch (error) {
     throw error;
   }

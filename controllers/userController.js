@@ -17,17 +17,17 @@ const User = db.user;
 const registerAccount = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-    const adminOrNot =
-      req.body.role == "admin" ? "admin" : `SEQ-${generateRandomId(4)}`;
+
     let user = await User.findOne({ where: { email: email } });
     if (user) throw new Error("Already register");
-    const adminOrNot =
-      req.body.role == "admin" ? "NAMTHIP" : `SEQ-${generateRandomId(4)}`;
+
+   
     const hashedPassword = await hashPassword(password);
     req.body.password = hashedPassword;
     let info = {
       name: req.body.name,
-      code_refferal: adminOrNot,
+      code_refferal:
+        req.body.role !== "siswa" ? "NAMTHIP" : `SEQ-${generateRandomId(4)}`,
       email: req.body.email,
       password: req.body.password,
       role: req.body.role,
