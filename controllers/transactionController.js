@@ -14,7 +14,16 @@ const Book = db.book;
 const User = db.user;
 const createTransaction = async (req, res) => {
   try {
+    let userData = await User.findOne({
+      where: { code_refferal: req.body.code_refferal },
+    });
+    if (userData.code_refferal !== "NAMTHIP") {
+      return res.send(
+        response(400, null, "Cannot access because youre not admin")
+      );
+    }
     const checkBook = await Book.findOne({ where: { id: req.body.bookid } });
+
     if (checkBook.dataValues.status === "unavailable") {
       return res.status(400).send({
         message: "Sorry, the book has been borrowed",
@@ -41,6 +50,7 @@ const createTransaction = async (req, res) => {
       status: "unavailable",
     };
     await Book.update(updateBook, { where: { id: req.body.bookid } });
+
     const templateSource = await fs.promises.readFile(templatePath, "utf8");
     const compileTemplate = Handlebars.compile(templateSource);
     const html = compileTemplate({
@@ -110,6 +120,11 @@ const createTransaction = async (req, res) => {
 
 const getDataTransaction = async (req, res) => {
   try {
+    if (userData.code_refferal !== "NAMTHIP") {
+      return res.send(
+        response(400, null, "Cannot access because youre not admin")
+      );
+    }
     const id = req.params.id;
     const transaction = await db.transaction.findOne({
       where: { id: id },
@@ -129,6 +144,11 @@ const getDataTransaction = async (req, res) => {
 
 const getPenalty = async (req, res) => {
   try {
+    if (userData.code_refferal !== "NAMTHIP") {
+      return res.send(
+        response(400, null, "Cannot access because youre not admin")
+      );
+    }
     const token = await Transaction.findOne({
       where: { token: req.body.token },
     });
@@ -153,6 +173,11 @@ const getPenalty = async (req, res) => {
 
 const bookReturner = async (req, res) => {
   try {
+    if (userData.code_refferal !== "NAMTHIP") {
+      return res.send(
+        response(400, null, "Cannot access because youre not admin")
+      );
+    }
     const token = await Transaction.findOne({
       where: { token: req.body.token },
     });
@@ -195,6 +220,11 @@ const searchBookOrAuthor = async (req, res) => {
 
 const extraTimeController = async (req, res) => {
   try {
+    if (userData.code_refferal !== "NAMTHIP") {
+      return res.send(
+        response(400, null, "Cannot access because youre not admin")
+      );
+    }
     const data = await Transaction.findOne({
       where: { token: req.body.token },
     });
@@ -218,6 +248,11 @@ const extraTimeController = async (req, res) => {
 
 const uploadImage = async (req, res) => {
   try {
+    if (userData.code_refferal !== "NAMTHIP") {
+      return res.send(
+        response(400, null, "Cannot access because youre not admin")
+      );
+    }
     const { file, params } = req;
     const id = parseInt(params.id);
 

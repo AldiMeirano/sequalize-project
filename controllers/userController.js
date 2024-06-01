@@ -21,11 +21,14 @@ const registerAccount = async (req, res) => {
 
     let user = await User.findOne({ where: { email: email } });
     if (user) throw new Error("Already register");
+    const adminOrNot =
+      req.body.role == "admin" ? "NAMTHIP" : `SEQ-${generateRandomId(4)}`;
     const hashedPassword = await hashPassword(password);
     req.body.password = hashedPassword;
     let info = {
       name: req.body.name,
-      code_refferal: `SEQ-${generateRandomId(4)}`,
+      code_refferal: adminOrNot,
+      role: req.body.role,
       email: req.body.email,
       password: req.body.password,
     };
