@@ -5,6 +5,7 @@ const Book = db.book;
 const User = db.user;
 const addNewBook = async (req, res) => {
   try {
+
     let user = await User.findOne({
       where: { code_refferal: req.body.code_refferal },
     });
@@ -14,6 +15,7 @@ const addNewBook = async (req, res) => {
         author: req.body.author,
         quantity: req.body.quantity,
       };
+
 
       const product = await Book.create(info);
 

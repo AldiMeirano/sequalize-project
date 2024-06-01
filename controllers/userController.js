@@ -9,16 +9,16 @@ const db = require("../models");
 const Handlebars = require("handlebars");
 const transporter = require("../lib/nodemailer");
 const scheduler = require("node-schedule");
-const { log } = require("console");
-const { where } = require("sequelize");
-// const { updateProduct } = require("");
-const { join } = require("path") ;
+
+
+const { join } = require("path");
 const User = db.user;
 
 const registerAccount = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-
+    const { name, email, password, role } = req.body;
+    const adminOrNot =
+      req.body.role == "admin" ? "admin" : `SEQ-${generateRandomId(4)}`;
     let user = await User.findOne({ where: { email: email } });
     if (user) throw new Error("Already register");
     const adminOrNot =
@@ -28,9 +28,9 @@ const registerAccount = async (req, res) => {
     let info = {
       name: req.body.name,
       code_refferal: adminOrNot,
-      role: req.body.role,
       email: req.body.email,
       password: req.body.password,
+      role: req.body.role,
     };
 
     const product = await User.create(info);

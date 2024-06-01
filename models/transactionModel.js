@@ -13,6 +13,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    status: {
+      type: DataTypes.ENUM,
+      values: ["borrow", "done"],
+      defaultValue: "borrow",
+      // allowNull: false,
+    },
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,

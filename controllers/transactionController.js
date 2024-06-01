@@ -14,6 +14,7 @@ const Book = db.book;
 const User = db.user;
 const createTransaction = async (req, res) => {
   try {
+
     let userData = await User.findOne({
       where: { code_refferal: req.body.code_refferal },
     });
@@ -21,6 +22,11 @@ const createTransaction = async (req, res) => {
       return res.send(
         response(400, null, "Cannot access because youre not admin")
       );
+
+    const dataUser = await User.findOne({ where: { id: req.body.userId } });
+    if (dataUser.role === "admin") {
+      return res.send(response(400, null, "As admin cannot checkout the book"));
+
     }
     const checkBook = await Book.findOne({ where: { id: req.body.bookid } });
 
@@ -29,6 +35,7 @@ const createTransaction = async (req, res) => {
         message: "Sorry, the book has been borrowed",
       });
     }
+
     let info = {
       token: `SMB-${generateRandomId(6)}`,
       bookid: req.body.bookid,
@@ -229,7 +236,6 @@ const extraTimeController = async (req, res) => {
       where: { token: req.body.token },
     });
 
-    // Jika tidak ditemukan, kembalikan respons "Not found"
     if (!data) {
       return res.send(response(404, null, "Not found"));
     }
@@ -255,11 +261,9 @@ const uploadImage = async (req, res) => {
     }
     const { file, params } = req;
     const id = parseInt(params.id);
-
     if (isNaN(id)) {
       return res.status(400).json({ message: "Invalid room ID" });
     }
-
     const info = {
       image: `/${file?.filename}`,
     };
