@@ -131,6 +131,14 @@ const getDataTransaction = async (req, res) => {
       ],
     });
 
+    if (transaction) {
+      const checkinDate = new Date(transaction.checkOut);
+      const checkoutDate = new Date(transaction.checkIn);
+      const duration = Math.ceil(
+        (checkoutDate - checkinDate) / (1000 * 60 * 60 * 24)
+      );
+      transaction.setDataValue("duration", duration);
+    }
     res.send(response(200, transaction, "Successfully get data"));
   } catch (error) {
     console.log(error);
