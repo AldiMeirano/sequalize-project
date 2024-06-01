@@ -2,8 +2,14 @@ const response = require("../helper/response");
 const db = require("../models");
 
 const Book = db.book;
+const User = db.user;
 const addNewBook = async (req, res) => {
   try {
+    const id = req.params.id;
+    let user = await User.findOne({ where: { id: id } });
+    if (user.role !== "admin") {
+      return res.send(response(400, null, "Youre not admin"));
+    }
     let info = {
       title: req.body.title,
       author: req.body.author,
