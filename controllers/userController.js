@@ -21,13 +21,11 @@ const registerAccount = async (req, res) => {
     let user = await User.findOne({ where: { email: email } });
     if (user) throw new Error("Already register");
 
-   
     const hashedPassword = await hashPassword(password);
     req.body.password = hashedPassword;
     let info = {
       name: req.body.name,
-      code_refferal:
-        req.body.role !== "siswa" ? "NAMTHIP" : `SEQ-${generateRandomId(4)}`,
+      code_refferal: `SEQ-${generateRandomId(4)}`,
       email: req.body.email,
       password: req.body.password,
       role: req.body.role,
@@ -113,7 +111,9 @@ const loginAccount = async (req, res) => {
 
 const verifiedCode = async (req, res) => {
   try {
-    let userData = await User.findOne({ where: { id: req.body.id } });
+    let userData = await User.findOne({
+      where: { code_refferal: req.body.code_refferal },
+    });
     if (userData.code_refferal !== req.body.code_refferal) {
       res.send(response(405, null, "Your otp its not correct"));
     }
