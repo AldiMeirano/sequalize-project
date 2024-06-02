@@ -184,14 +184,8 @@ const bookReturner = async (req, res) => {
     if (!token) {
       res.status(400).send("Token is'nt correct");
     }
-    const info1 = {
-      status: "done",
-    };
-    await Transaction.update(info1, {
-      where: { token: req.body.token },
-    });
+  
     const info = {
-
       quantity: token.cart,
     };
     const transaction = await Book.update(info, {
