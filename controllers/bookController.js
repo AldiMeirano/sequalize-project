@@ -3,14 +3,27 @@ const db = require("../models");
 
 const Book = db.book;
 const User = db.user;
+
+
+const getAllDataBook = async (req, res) => {
+  try {
+    const dataUser = await Book.findAll();
+    res.send(response(200, dataUser, "Success get all data"));
+  } catch (error) {
+    console.log(error);
+  }
+};
 const addNewBook = async (req, res) => {
   try {
-    let user = await User.findOne({
-      where: { code_refferal: req.body.code_refferal },
-    });
-    if (user.code_refferal !== "NAMTHIP") {
-      return res.send(response(404, null, "Youre not admin cannot"));
+    const { user } = req;
+    const dataUser = await User.findOne({ where: { email: user.email } });
+    if (dataUser.role !== "admin") {
+      res.status(400).send({
+        status: false,
+        message: "Cannot acces this feature",
+      });
     }
+    console.log("babi", user);
     let info = {
       title: req.body.title,
       author: req.body.author,
@@ -18,7 +31,6 @@ const addNewBook = async (req, res) => {
     };
 
     const product = await Book.create(info);
-
     return res.send(response(200, product, "Success created new book"));
   } catch (error) {
     throw error;
@@ -37,13 +49,13 @@ const getOneBook = async (req, res) => {
 
 const updateDataBook = async (req, res) => {
   try {
-    let user = await User.findOne({
-      where: { code_refferal: req.body.code_refferal },
-    });
-    if (user.code_refferal !== "NAMTHIP") {
-      return res.send(
-        response(400, null, "Cannot access because youre not admin")
-      );
+    const { user } = req;
+    const dataUser = await User.findOne({ where: { email: user.email } });
+    if (dataUser.role !== "admin") {
+      res.status(400).send({
+        status: false,
+        message: "Cannot acces this feature",
+      });
     }
     let id = req.params.id;
 
@@ -57,13 +69,13 @@ const updateDataBook = async (req, res) => {
 
 const deleteDataBook = async (req, res) => {
   try {
-    let user = await User.findOne({
-      where: { code_refferal: req.body.code_refferal },
-    });
-    if (user.code_refferal !== "NAMTHIP") {
-      return res.send(
-        response(400, null, "Cannot access because youre not admin")
-      );
+    const { user } = req;
+    const dataUser = await User.findOne({ where: { email: user.email } });
+    if (dataUser.role !== "admin") {
+      res.status(400).send({
+        status: false,
+        message: "Cannot acces this feature",
+      });
     }
     let id = req.params.id;
     let products = await Book.findAll({});
@@ -78,6 +90,7 @@ module.exports = {
   getOneBook,
   updateDataBook,
   deleteDataBook,
+  getAllDataBook,
 };
 
 

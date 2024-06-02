@@ -15,26 +15,31 @@ const User = db.user;
 const createTransaction = async (req, res) => {
   try {
     const dataUser = await User.findOne({ where: { id: req.body.userId } });
-    const adminOrNot =
-      req.body.role == "admin" ? "NAMTHIP" : `SMB-${generateRandomId(6)}`;
-    if (dataUser.role === "admin") {
-      return res.send(response(400, null, "As admin cannot checkout the book"));
-    }
-    const checkBook = await Book.findOne({ where: { id: req.body.bookid } });
 
-    // if (checkBook.status === "unavailable") {
-    //   return res.status(400).send({
-    //     message: "Sorry, the book has been borrowed",
-    //   });
-    // }
+    if (dataUser.role === "admin") {
+      return res.send(response(400, null, "Cannot acces the feature"));
+    }
+
+    let checkBook = await Book.findOne({ where: { id: req.body.bookid } });
+    if (checkBook.quantit <= 1) {
+      return res.status(400).send({
+        message: "Sorry, stock lagi kosong",
+      });
+    }
+    if (checkBook.quantity <= 0) {
+      return res.status(400).send({
+        message: "Sorry, the book has been borrowed",
+      });
+    }
 
     let info = {
-      token: adminOrNot,
+      token: `SMB-${generateRandomId(6)}`,
       bookid: req.body.bookid,
       userId: req.body.userId,
       employeId: req.body.employeId,
       checkIn: req.body.checkIn,
       checkOut: req.body.checkOut,
+      cart: req.body.cart,
     };
 
     const product = await Transaction.create(info);
@@ -45,12 +50,13 @@ const createTransaction = async (req, res) => {
       "../templates",
       "afterCheckout.hbs"
     );
-    const decrement = req.body.cart - checkBook.quantity;
-    const updateBook = {
-      status: "unavailable",
+    const decrement = checkBook.quantity - req.body.cart;
+
+    let updateBook = {
       quantity: decrement,
     };
     await Book.update(updateBook, { where: { id: req.body.bookid } });
+
     const templateSource = await fs.promises.readFile(templatePath, "utf8");
     const compileTemplate = Handlebars.compile(templateSource);
     const html = compileTemplate({
@@ -70,8 +76,8 @@ const createTransaction = async (req, res) => {
     const oneMinuteFromNow = new Date(Date.now() + 1 * 60 * 1000);
     scheduler.scheduleJob(oneMinuteFromNow, async () => {
       try {
-        const bookData = await Book.findOne({ where: { id: id } });
-        if (bookData.status == "unavailable") {
+        const bookData = await Book.findOne({ where: { id: req.body.bookid } });
+        if (bookData.quantity <= 1) {
           const templatePath = path.join(
             __dirname,
             "../templates",
@@ -180,11 +186,19 @@ const bookReturner = async (req, res) => {
     }
 
     const info = {
-      status: "available",
+      quantity: token.cart,
     };
 
     const transaction = await Book.update(info, {
       where: { id: token.bookid },
+    });
+
+    const info1 = {
+      status: "done",
+    };
+
+    await Transaction.update(info1, {
+      where: { token: req.body.token },
     });
 
     res.send(response(200, transaction, "Success return book"));
@@ -240,6 +254,7 @@ const uploadImage = async (req, res) => {
     if (isNaN(id)) {
       return res.status(400).json({ message: "Invalid room ID" });
     }
+
     const info = {
       image: `/${file?.filename}`,
     };

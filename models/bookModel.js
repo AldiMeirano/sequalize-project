@@ -22,12 +22,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    status: {
-      type: DataTypes.ENUM,
-      values: ["available", "unavailable "],
-      defaultValue: "available",
-      allowNull: false,
-    },
   });
   return Book;
 };
