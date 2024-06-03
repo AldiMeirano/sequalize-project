@@ -189,13 +189,13 @@ const uploader = require("../middleware/uploader");
 
 const router = require("express").Router();
 
-router.post("/register", userController.registerAccount);
-router.post("/login", userController.loginAccount);
-router.post("/verified", userController.verifiedCode);
-router.post("/forgot-password", userController.forgotPassword);
-router.patch("/reset-password", verifyToken, userController.resetPassword);
+router.post("/register/v1", userController.registerAccount);
+router.post("/login/v1", userController.loginAccount);
+router.post("/verified/v1", userController.verifiedCode);
+router.post("/forgot-password/v1", userController.forgotPassword);
+router.patch("/reset-password/v1", verifyToken, userController.resetPassword);
 router.patch(
-  "/photo-profile",
+  "/photo-profile/v1",
   verifyToken,
   uploader("IMG", "/profile").single("file"),
   userController.uploadPicture

@@ -240,14 +240,14 @@ const router = require("express").Router();
  *         description: The transaction was not found
  */
 
-router.post("/", transactionController.createTransaction);
-router.get("/:id", transactionController.getDataTransaction);
-router.patch("/penalty", transactionController.getPenalty);
-router.patch("/return-book", transactionController.bookReturner);
-router.post("/search", transactionController.searchBookOrAuthor);
-router.patch("/extratime", transactionController.extraTimeController);
+router.post("/v1", transactionController.createTransaction);
+router.get("/v1/:id", transactionController.getDataTransaction);
+router.patch("/penalty/v1", transactionController.getPenalty);
+router.patch("/return-book/v1", transactionController.bookReturner);
+router.post("/search/v1", transactionController.searchBookOrAuthor);
+router.patch("/extratime/v1", transactionController.extraTimeController);
 router.patch(
-  "/upload/:id",
+  "/upload/v1/:id",
   uploader("IMG", "/images").single("file"),
   transactionController.uploadImage
 );
