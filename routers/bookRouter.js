@@ -68,7 +68,7 @@ const router = require("express").Router();
 
 /**
  * @swagger
- * /api/book/v1:
+ * /api/v1/book:
  *   get:
  *     summary: Returns the list of all the books
  *     tags: [Books]
@@ -85,7 +85,7 @@ const router = require("express").Router();
 
 /**
  * @swagger
- * /api/book/add-book/v1:
+ * /api/v1/book/add-book:
  *   post:
  *     summary: Adds a new book
  *     tags: [Books]
@@ -108,7 +108,7 @@ const router = require("express").Router();
 
 /**
  * @swagger
- * /api/book/v1/{id}:
+ * /api/v1/book/{id}:
  *   get:
  *     summary: Get a book by ID
  *     tags: [Books]
@@ -132,7 +132,7 @@ const router = require("express").Router();
 
 /**
  * @swagger
- * /api/book/v1/{id}:
+ * /api/v1/book/{id}:
  *   patch:
  *     summary: Update a book by ID
  *     tags: [Books]
@@ -164,7 +164,7 @@ const router = require("express").Router();
 
 /**
  * @swagger
- * /api/book/v1/{id}:
+ * /api/v1/book/{id}:
  *   delete:
  *     summary: Delete a book by ID
  *     tags: [Books]
@@ -194,10 +194,10 @@ const router = require("express").Router();
  *       404:
  *         description: The book was not found
  */
-router.get("/v1", bookController.getAllDataBook);
-router.post("/add-book/v1", verifyToken, bookController.addNewBook);
-router.get("/v1/:id", bookController.getOneBook);
-router.patch("/v1/:id", verifyToken, bookController.updateDataBook);
-router.delete("/v1/:id", verifyToken, bookController.deleteDataBook);
+router.get("/", bookController.getAllDataBook);
+router.post("/add-book", verifyToken, bookController.addNewBook);
+router.get("/:id", bookController.getOneBook);
+router.patch("/:id", verifyToken, bookController.updateDataBook);
+router.delete("/:id", verifyToken, bookController.deleteDataBook);
 
 module.exports = router;

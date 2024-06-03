@@ -37,7 +37,7 @@
 
 /**
  * @swagger
- * /api/user/register:
+ * /api/v1/user/register:
  *   post:
  *     summary: Register a new user
  *     tags: [Users]
@@ -56,7 +56,7 @@
 
 /**
  * @swagger
- * /api/user/login:
+ * /api/v1/user/login:
  *   post:
  *     summary: Login a user
  *     tags: [Users]
@@ -83,7 +83,7 @@
 
 /**
  * @swagger
- * /api/user/verified:
+ * /api/v1/user/verified:
  *   post:
  *     summary: Verify a user code
  *     tags: [Users]
@@ -110,7 +110,7 @@
 
 /**
  * @swagger
- * /api/user/forgot-password:
+ * /api/v1/user/forgot-password:
  *   post:
  *     summary: Send forgot password email
  *     tags: [Users]
@@ -134,7 +134,7 @@
 
 /**
  * @swagger
- * /api/user/reset-password:
+ * /api/v1/user/reset-password:
  *   patch:
  *     summary: Reset a user's password
  *     tags: [Users]
@@ -160,7 +160,7 @@
 
 /**
  * @swagger
- * /api/user/photo-profile:
+ * /api/v1/user/photo-profile:
  *   patch:
  *     summary: Upload a profile picture
  *     tags: [Users]
@@ -189,11 +189,11 @@ const uploader = require("../middleware/uploader");
 
 const router = require("express").Router();
 
-router.post("/register/v1", userController.registerAccount);
-router.post("/login/v1", userController.loginAccount);
-router.post("/verified/v1", userController.verifiedCode);
-router.post("/forgot-password/v1", userController.forgotPassword);
-router.patch("/reset-password/v1", verifyToken, userController.resetPassword);
+router.post("/register", userController.registerAccount);
+router.post("/login", userController.loginAccount);
+router.post("/verified", userController.verifiedCode);
+router.post("/forgot-password", userController.forgotPassword);
+router.patch("/reset-password", verifyToken, userController.resetPassword);
 router.patch(
   "/photo-profile/v1",
   verifyToken,

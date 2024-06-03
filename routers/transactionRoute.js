@@ -61,7 +61,7 @@ const router = require("express").Router();
 
 /**
  * @swagger
- * /api/transaction:
+ * /api/transaction/v1:
  *   post:
  *     summary: Create a new transaction
  *     tags: [Transactions]
@@ -84,7 +84,7 @@ const router = require("express").Router();
 
 /**
  * @swagger
- * /api/transaction/{id}:
+ * /api/transaction/v1/{id}:
  *   get:
  *     summary: Get a transaction by ID
  *     tags: [Transactions]
@@ -108,7 +108,7 @@ const router = require("express").Router();
 
 /**
  * @swagger
- * /api/transaction/penalty:
+ * /api/transaction/penalty/v1:
  *   patch:
  *     summary: Calculate penalty for a transaction
  *     tags: [Transactions]
@@ -133,7 +133,7 @@ const router = require("express").Router();
 
 /**
  * @swagger
- * /api/transaction/return-book:
+ * /api/transaction/return-book/v1:
  *   patch:
  *     summary: Return a book
  *     tags: [Transactions]
@@ -158,7 +158,7 @@ const router = require("express").Router();
 
 /**
  * @swagger
- * /api/transaction/search:
+ * /api/transaction/search/v1:
  *   post:
  *     summary: Search for a book or author
  *     tags: [Transactions]
@@ -183,7 +183,7 @@ const router = require("express").Router();
 
 /**
  * @swagger
- * /api/transaction/extratime:
+ * /api/transaction/extratime/v1:
  *   patch:
  *     summary: Extend the return time for a transaction
  *     tags: [Transactions]
@@ -212,7 +212,7 @@ const router = require("express").Router();
 
 /**
  * @swagger
- * /api/transaction/upload/{id}:
+ * /api/transaction/upload/v1/{id}:
  *   patch:
  *     summary: Upload an image for a transaction
  *     tags: [Transactions]
@@ -240,14 +240,14 @@ const router = require("express").Router();
  *         description: The transaction was not found
  */
 
-router.post("/v1", transactionController.createTransaction);
-router.get("/v1/:id", transactionController.getDataTransaction);
-router.patch("/penalty/v1", transactionController.getPenalty);
-router.patch("/return-book/v1", transactionController.bookReturner);
-router.post("/search/v1", transactionController.searchBookOrAuthor);
-router.patch("/extratime/v1", transactionController.extraTimeController);
+router.post("/", transactionController.createTransaction);
+router.get("/:id", transactionController.getDataTransaction);
+router.patch("/penalty", transactionController.getPenalty);
+router.patch("/return-book", transactionController.bookReturner);
+router.get("/search", transactionController.searchBookOrAuthor);
+router.patch("/extratime", transactionController.extraTimeController);
 router.patch(
-  "/upload/v1/:id",
+  "/upload/:id",
   uploader("IMG", "/images").single("file"),
   transactionController.uploadImage
 );
