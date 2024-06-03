@@ -13,10 +13,10 @@ const user = require("./routers/userRouter");
 const book = require("./routers/bookRouter");
 const transaction = require("./routers/transactionRoute");
 
-app.use("/api/book", book);
-app.use("/api/products", product);
-app.use("/api/user", user);
-app.use("/api/transaction", transaction);
+app.use("/api/v1/book", book);
+app.use("/api/v1/products", product);
+app.use("/api/v1/user", user);
+app.use("/api/v1/transaction", transaction);
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));

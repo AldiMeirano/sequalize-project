@@ -8,6 +8,7 @@ const transporter = require("../lib/nodemailer");
 const scheduler = require("node-schedule");
 const { formatDate } = require("../lib/formattedDate");
 
+const { Op } = require("sequelize");
 
 const Transaction = db.transaction;
 const Book = db.book;
@@ -184,14 +185,13 @@ const bookReturner = async (req, res) => {
     if (!token) {
       res.status(400).send("Token is'nt correct");
     }
-  
+
     const info = {
       quantity: token.cart,
     };
     const transaction = await Book.update(info, {
       where: { id: token.bookid },
     });
-
 
     const info1 = {
       status: "done",
@@ -201,7 +201,6 @@ const bookReturner = async (req, res) => {
       where: { token: req.body.token },
     });
 
-
     res.send(response(200, transaction, "Success return book"));
   } catch (error) {
     console.log(error);
@@ -210,17 +209,35 @@ const bookReturner = async (req, res) => {
 
 const searchBookOrAuthor = async (req, res) => {
   try {
-    if (req.body.title) {
-      const data = await Book.findAll({
-        where: { title: req.body.title },
+    const { title, author } = req.query;
+    // console.log("pepe", search);
+    let ProductData = "";
+    if (title) {
+      const books = await Book.findAll({
+        where: {
+          title: {
+            [Op.like]: `%${title}%`,
+          },
+        },
       });
-      return res.send(response(200, data, "Success get data book"));
-    } else {
-      const data = await Book.findAll({
-        where: { author: req.body.author },
-      });
-      return res.send(response(200, data, "Success get data by author"));
+      ProductData = books;
+      return res.send(response(200, ProductData, "Success get data book"));
     }
+    if (author) {
+      const books = await Book.findAll({
+        where: {
+          author: {
+            [Op.like]: `%${author}%`,
+          },
+        },
+      });
+
+      ProductData = books;
+    }
+
+    const books = await Book.findAll();
+    ProductData = books;
+    return res.send(response(200, ProductData, "Success get data book"));
   } catch (error) {
     console.log(error);
   }
