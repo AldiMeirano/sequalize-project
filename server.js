@@ -19,7 +19,7 @@ app.use("/api/v1/user", user);
 app.use("/api/v1/transaction", transaction);
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use("/api/v1/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
