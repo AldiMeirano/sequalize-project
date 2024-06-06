@@ -8,8 +8,8 @@
     },
     "servers": [
       {
-        "url": "http://localhost:8080",
-        "description": "Local server"
+        "url": "https://128.199.206.234:8080",
+        "description": "Server"
       }
     ],
     "components": {

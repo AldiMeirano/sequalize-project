@@ -2,22 +2,6 @@ const bookController = require("../controllers/bookController");
 const verifyToken = require("../middleware/jwt");
 const router = require("express").Router();
 
-/**
- * @swagger
- * /book/v1:
- *   get:
- *     summary: Returns the list of all the books
- *     tags: [Books]
- *     responses:
- *       200:
- *         description: The list of the books
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Book'
- */
 
 /**
  * @swagger

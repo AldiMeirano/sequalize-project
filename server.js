@@ -21,7 +21,7 @@ app.use("/api/v1/transaction", transaction);
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api/v1/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);
 });
